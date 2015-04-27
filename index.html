@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Error!</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
 	<style>
 		iframe, #overlay {
 			position:absolute;
@@ -22,6 +23,9 @@
 			-o-user-select: none;
 			user-select: none;
 		}
+		img  {
+			width:100%;
+		}
 	</style>
 </head>
 <body>
@@ -30,17 +34,41 @@
 	location.search.replace(/(\w+)=([^&]*)/g,function(match, key, value){
 		GET[key]=decodeURIComponent(value);
 	});
-
-	document.write(['<iframe src="http://', GET['url'] ,'"></iframe>'].join(''));
-	document.write(['<iframe src="./pages/', GET['error'] ,'.html" style="display:none" id="error"></iframe>'].join(''));
+	if (GET['url']) {
+		document.write(['<iframe src="http://', GET['url'], '"></iframe>'].join(''));
+		document.write(['<iframe src="./pages/', GET['error'], '.html" style="display:none" id="error"></iframe>'].join(''));
+		document.write('<div id="overlay"></div>');
+	}
 </script>
-<div id="overlay"></div>
+
+<form name="errorize" class="container" style="display:none" >
+	<div class="col-md-8 col-md-offset-2">
+		<img src="meme.jpg" alt="Ragefix"/>
+		<div  class="form">
+			<div class="form-group">
+				<div class="input-group">
+					<span class="input-group-addon">http://</span>
+					<input type="text" placeholder="example.ltd" required name="url" class="form-control">
+				</div>
+			</div>
+			<div class="form-group">
+			<select required name="error" class="form-control">
+				<option value="symfony-fatal">Symfony Syntax</option>
+				<option value="chrome-404">Chrome 404</option>
+			</select>
+			</div>
+			<div class="text-right">
+			<button onclick="errorize()" class="btn btn-primary btn-lg">Go and fix the page!</button>
+			</div>
+		</div>
+	</div>
+</form>
+
+
 </body>
 </html>
 <script>
-	setTimeout(function() {
-		document.getElementById('error').style.display = 'block';
-	}, Math.random()*3000 + 1000);
+
 
 
 	var interact = (function() {
@@ -56,15 +84,15 @@
 			}
 			clearTimeout(timeout);
 			timeout = setTimeout(function () {
-				var message = clickCounter > 0 ? 'clicking ' + clickCounter + ' times' : '';
+				var message = clickCounter > 0 ? clickCounter + ' clicks ' : '';
 				if (message !== '' && buffer !== ''){
 					message += ' and '
 				}
 				if (buffer !== '') {
-					message += 'typing "' + buffer + '"';
+					message += 'typing ' + buffer;
 				}
 				message = message[0].toUpperCase()+message.substr(1);
-				message = 'Congratulations! ' + message +  ' fixed the problem!';
+				message = 'Issue Resolved ' + message +  ' has corrected the error';
 				alert(message);
 				document.getElementById('error').style.display = 'none';
 				document.getElementById('overlay').style.display = 'none';
@@ -73,10 +101,18 @@
 	})();
 
 
-	document.addEventListener('keypress', function(e){
-		interact(false, String.fromCharCode(e.which));
-	});
-	document.addEventListener('mouseup', function(){
-		interact(true);
-	});
+	if (GET['url']) {
+		setTimeout(function() {
+			document.getElementById('error').style.display = 'block';
+		}, Math.random()*3000 + 1000);
+
+		document.addEventListener('keypress', function (e) {
+			interact(false, String.fromCharCode(e.which));
+		});
+		document.addEventListener('mouseup', function () {
+			interact(true);
+		});
+	} else {
+		document.forms.errorize.style.display = 'block';
+	}
 </script>
